@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+/* Setup background gelap dan font */
+@layer base {
+  body {
+    background-color: #0a0a0a;
+    color: white;
+    overflow-x: hidden;
+    font-family:
+      system-ui,
+      -apple-system,
+      sans-serif;
+  }
+}
+
+/* Custom shadow neo-brutalist */
+@layer utilities {
+  .shadow-brutal {
+    box-shadow: 6px 6px 0px 0px rgba(255, 255, 255, 1);
+  }
+  .shadow-brutal-hover {
+    box-shadow: 10px 10px 0px 0px rgba(255, 255, 255, 1);
+  }
+}
