@@ -51,7 +51,7 @@ export default function Contact() {
               {/* Input Name */}
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-bold text-neutral-400 uppercase tracking-widest">
-                  Nama
+                  Name
                 </label>
                 <input
                   type="text"
@@ -75,7 +75,7 @@ export default function Contact() {
               {/* Input Message */}
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-bold text-neutral-400 uppercase tracking-widest">
-                  Pesan
+                  Note
                 </label>
                 <textarea
                   rows="5"
