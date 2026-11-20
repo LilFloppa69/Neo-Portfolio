@@ -628,7 +628,10 @@ export default function Home() {
 
           <Reveal className="mt-20 flex flex-col justify-between gap-6 border-t border-white/15 pt-6 text-[9px] font-bold uppercase tracking-[0.2em] text-neutral-500 sm:flex-row sm:items-center sm:text-[10px]">
             <span>© 2026 Yazid Chairy Syahputra Nasution</span>
-            <span>Designed with curiosity · Built with intention</span>
+            <span>
+              Designed with curiosity · Built with intention · And also we do a
+              little trolling
+            </span>
             <Link
               to="/contact"
               className="w-fit text-white transition-colors hover:text-yellow-400"
