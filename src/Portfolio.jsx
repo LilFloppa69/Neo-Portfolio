@@ -1,245 +1,330 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+
+import PortfolioPageLayout, {
+  Reveal,
+  SectionHeading,
+} from "./components/PortfolioPageLayout";
+
+const projects = [
+  {
+    title: "Gamified LMS",
+    category: "Full-stack development",
+    desc: "Learning Management System with Gamification to motivate and attract more students.",
+    stack: ["MongoDB", "Express", "React", "Node.js"],
+    role: "Full-Stack Developer & System Designer",
+    images: [
+      "/Images/ClassHub.png",
+      "/Images/Classhub (Class).png",
+      "/Images/Classhub (Forum).png",
+      "/Images/Classhub (Evaluation).png",
+    ],
+  },
+  {
+    title: "Klinik Nakita",
+    category: "Frontend development",
+    desc: "A Modern ERM Website built with Laravel Livewire and Tailwind CSS.",
+    stack: ["Laravel", "Livewire", "Blade", "Tailwind CSS"],
+    role: "Frontend Developer",
+    images: ["/Images/Klinik Nakita.png"],
+  },
+  {
+    title: "Crossy Road with Three.js",
+    category: "Interactive experiment",
+    desc: "My first time using Three.js and developing it into a game.",
+    stack: ["Three.js", "JavaScript"],
+    role: "Frontend Developer",
+    images: ["/Images/Crossy Road.jpg"],
+  },
+  {
+    title: "Expense Tracker",
+    category: "Web application",
+    desc: "An application to track budget and expenses, built with React.",
+    stack: ["React.js"],
+    role: "Frontend Developer",
+    images: ["/Images/Expense Tracker.png"],
+  },
+];
+
+function ArrowIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-5 w-5"
+      aria-hidden="true"
+    >
+      <path d="M7 17 17 7M7 7h10v10" />
+    </svg>
+  );
+}
 
 export default function Portfolio() {
-  const projects = [
-    {
-      title: "Gamified LMS",
-      desc: "Learning Management System with Gamification to motivate and attract more students.",
-      stack: ["MongoDB", "Express", "React", "Node.js"],
-      role: "Full-Stack Developer & System Designer",
-      // Tambahkan array images, isi dengan path gambar jika ada
-      images: [
-        "/Images/ClassHub.png",
-        "/Images/Classhub (Class).png",
-        "/Images/Classhub (Forum).png",
-        "/Images/Classhub (Evaluation).png",
-      ],
-    },
-    {
-      title: "Klinik Nakita",
-      desc: "A Modern ERM Website built with Laravel Livewire and Tailwind CSS",
-      stack: ["Laravel", "Blade"],
-      role: "Frontend Developer",
-      // Kosongkan array untuk mengetes pesan "You don't have any image..."
-      images: ["/Images/Klinik Nakita.png"],
-    },
-    {
-      title: "Crossy Road with Three.js",
-      desc: "My First Time of Using Three JS and Developed it into a game",
-      stack: ["Three.js"],
-      role: "Frontend Developer",
-      // Kosongkan array untuk mengetes pesan "You don't have any image..."
-      images: ["/Images/Crossy Road.jpg"],
-    },
-    {
-      title: "Expense Tracker",
-      desc: "An Application to Track Budget and Expense, built with React",
-      stack: ["React.js"],
-      role: "Frontend Developer",
-      // Kosongkan array untuk mengetes pesan "You don't have any image..."
-      images: ["/Images/Expense Tracker.png"],
-    },
-  ];
-
-  // State untuk Modal Gallery
   const [selectedProject, setSelectedProject] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Fungsi navigasi Gallery
   const openGallery = (project) => {
     setSelectedProject(project);
     setCurrentImageIndex(0);
   };
 
-  const closeGallery = () => {
-    setSelectedProject(null);
-  };
+  const closeGallery = () => setSelectedProject(null);
 
   const nextImage = () => {
-    if (selectedProject && selectedProject.images.length > 0) {
-      setCurrentImageIndex(
-        (prev) => (prev + 1) % selectedProject.images.length,
-      );
-    }
+    if (!selectedProject?.images?.length) return;
+
+    setCurrentImageIndex(
+      (current) => (current + 1) % selectedProject.images.length,
+    );
   };
 
   const prevImage = () => {
-    if (selectedProject && selectedProject.images.length > 0) {
-      setCurrentImageIndex((prev) =>
-        prev === 0 ? selectedProject.images.length - 1 : prev - 1,
-      );
-    }
+    if (!selectedProject?.images?.length) return;
+
+    setCurrentImageIndex((current) =>
+      current === 0 ? selectedProject.images.length - 1 : current - 1,
+    );
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-10 relative">
-      <div className="w-full max-w-3xl">
-        {/* Header */}
-        <div className="w-full max-w-[380px] mb-6">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 px-4 py-2 border-2 border-white text-white font-bold uppercase tracking-wider hover:bg-white hover:text-black hover:shadow-[4px_4px_0px_0px_#facc15] transition-all text-sm"
+    <PortfolioPageLayout
+      number="02"
+      label="Selected work"
+      title="Ideas turned"
+      accent="into work."
+      description="A selection of projects, interfaces, and experiments I've worked on. Open a project to browse its available screens and details."
+    >
+      <Reveal className="mb-8 grid gap-3 sm:grid-cols-3">
+        {[
+          { value: "04", label: "Featured projects" },
+          { value: "MERN", label: "Core stack" },
+          { value: "BUILD", label: "Learn by making" },
+        ].map((item) => (
+          <div
+            key={item.label}
+            className="border border-white/15 bg-[#101010] px-5 py-4"
           >
-            <span>←</span> Back
-          </Link>
-        </div>
-
-        <div className="relative w-fit mb-10">
-          <div className="absolute top-3.5 left-3.5 w-full h-full bg-yellow-400" />
-          <div className="relative bg-neutral-900 border-[3px] border-neutral-100 p-8 pr-16">
-            <div className="w-14 h-14 rounded-full border-[3px] border-neutral-100 flex items-center justify-center mb-6">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-6 h-6 stroke-neutral-100"
-              >
-                <rect x="3" y="7" width="18" height="12" rx="1" />
-                <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
-              </svg>
-            </div>
-            <h1 className="font-bold text-3xl tracking-tight text-neutral-100 mb-1">
-              Portfolio
-            </h1>
-            <p className="text-sm font-medium text-neutral-400">
-              Projects that i've built before
+            <p className="text-2xl font-black tracking-tight text-yellow-400">
+              {item.value}
+            </p>
+            <p className="mt-1 text-[9px] font-black uppercase tracking-[0.18em] text-neutral-500">
+              {item.label}
             </p>
           </div>
-        </div>
+        ))}
+      </Reveal>
 
-        {/* Project list */}
-        <div className="flex flex-col gap-8">
-          {projects.map((project, i) => (
-            <div key={project.title} className="relative">
-              <div className="absolute top-3.5 left-3.5 w-full h-full bg-yellow-400" />
-              <div className="relative bg-neutral-900 border-[3px] border-neutral-100 p-8">
-                <div className="flex items-start justify-between mb-4">
-                  <span className="font-bold text-sm text-yellow-400">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span className="text-xs font-medium text-neutral-400 border-2 border-neutral-700 px-2.5 py-1">
-                    {project.role}
+      <Reveal>
+        <SectionHeading
+          number="01"
+          label="Project archive"
+          title="Selected"
+          accent="projects."
+          description="A closer look at the ideas, tools, and interfaces behind each project."
+        />
+      </Reveal>
+
+      <div className="grid gap-5 lg:grid-cols-2">
+        {projects.map((project, index) => (
+          <Reveal
+            key={project.title}
+            delay={index * 0.07}
+            className={index === 0 ? "lg:col-span-2" : ""}
+          >
+            <article
+              className={`group h-full overflow-hidden border border-white/20 bg-[#101010] transition-colors duration-300 hover:border-yellow-400 ${
+                index === 0
+                  ? "grid lg:grid-cols-[1.15fr_0.85fr]"
+                  : "flex flex-col"
+              }`}
+            >
+              <button
+                type="button"
+                onClick={() => openGallery(project)}
+                aria-label={`Open ${project.title} project gallery`}
+                className={`relative block w-full overflow-hidden bg-black text-left ${
+                  index === 0
+                    ? "aspect-[16/10] lg:aspect-auto lg:min-h-[390px]"
+                    : "aspect-[16/10]"
+                }`}
+              >
+                <img
+                  src={project.images[0]}
+                  alt={`${project.title} project preview`}
+                  loading="lazy"
+                  className="h-full w-full object-cover opacity-80 transition duration-700 group-hover:scale-[1.04] group-hover:opacity-100"
+                />
+
+                <span className="absolute left-4 top-4 border border-white/40 bg-black/75 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.18em] text-white">
+                  Project / {String(index + 1).padStart(2, "0")}
+                </span>
+
+                <span className="absolute bottom-4 right-4 flex h-11 w-11 items-center justify-center border border-white/60 bg-black/75 text-white transition-colors group-hover:border-yellow-400 group-hover:bg-yellow-400 group-hover:text-black">
+                  <ArrowIcon />
+                </span>
+              </button>
+
+              <div className="flex flex-1 flex-col p-6 sm:p-8">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-yellow-400">
+                    {project.category}
+                  </p>
+
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-neutral-500">
+                    {project.images.length}{" "}
+                    {project.images.length === 1 ? "image" : "images"}
                   </span>
                 </div>
 
-                <h2 className="font-bold text-2xl text-neutral-100 mb-3">
+                <h2 className="mt-5 text-2xl font-black uppercase leading-tight tracking-tight sm:text-3xl">
                   {project.title}
                 </h2>
 
-                <p className="text-sm leading-relaxed text-neutral-400 mb-5 max-w-[60ch]">
+                <p className="mt-3 max-w-xl text-sm leading-7 text-neutral-400">
                   {project.desc}
                 </p>
 
-                <div className="flex flex-wrap gap-2 mb-6">
+                <div className="mt-6 flex flex-wrap gap-2">
                   {project.stack.map((tag) => (
                     <span
                       key={tag}
-                      className="text-xs font-medium text-neutral-100 border-2 border-neutral-100 px-2.5 py-1"
+                      className="border border-white/20 px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-neutral-300"
                     >
                       {tag}
                     </span>
                   ))}
                 </div>
 
-                <hr className="border-t-2 border-neutral-800 mb-4" />
+                <div className="mt-auto mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5">
+                  <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-neutral-500">
+                    {project.role}
+                  </span>
 
-                <button
-                  onClick={() => openGallery(project)}
-                  className="text-sm font-semibold text-neutral-100 hover:text-yellow-400 transition-colors"
-                >
-                  Detailed View →
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => openGallery(project)}
+                    className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.16em] text-white transition-colors hover:text-yellow-400"
+                  >
+                    Detailed view <span>↗</span>
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            </article>
+          </Reveal>
+        ))}
       </div>
 
-      {/* Gallery Modal / Overlay */}
+      <Reveal className="mt-16 border border-yellow-400/50 bg-yellow-400/[0.06] p-6 sm:p-8">
+        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+          <div>
+            <p className="text-[9px] font-black uppercase tracking-[0.22em] text-yellow-400">
+              Have an idea?
+            </p>
+
+            <h3 className="mt-2 text-2xl font-black uppercase tracking-tight sm:text-3xl">
+              Let&apos;s make it happen.
+            </h3>
+          </div>
+
+          <a
+            href="https://github.com/LilFloppa69"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex w-fit items-center gap-3 border border-white/35 px-5 py-3 text-[10px] font-black uppercase tracking-[0.16em] transition-colors hover:border-yellow-400 hover:bg-yellow-400 hover:text-black"
+          >
+            Find me on GitHub <ArrowIcon />
+          </a>
+        </div>
+      </Reveal>
+
+      {/* PROJECT GALLERY */}
       <AnimatePresence>
         {selectedProject && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4 md:p-10 backdrop-blur-sm"
+            onClick={closeGallery}
+            className="fixed inset-0 z-[120] flex items-center justify-center bg-black/90 p-4 backdrop-blur-md md:p-8"
           >
-            {/* Modal Container */}
             <motion.div
-              initial={{ scale: 0.95, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 20 }}
-              className="relative w-full max-w-5xl bg-neutral-900 border-[3px] border-neutral-100 p-6 shadow-[12px_12px_0px_0px_#facc15]"
+              initial={{ opacity: 0, y: 24, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 18, scale: 0.97 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              onClick={(event) => event.stopPropagation()}
+              className="relative max-h-[92vh] w-full max-w-6xl overflow-y-auto border border-white/25 bg-[#101010] p-4 shadow-[10px_10px_0_0_#facc15] sm:p-6"
             >
-              {/* Header Modal & Close Button */}
-              <div className="flex justify-between items-center mb-6 pb-4 border-b-2 border-neutral-800">
-                <h3 className="text-2xl font-bold text-white">
-                  {selectedProject.title}
-                </h3>
+              <div className="mb-5 flex items-start justify-between gap-4 border-b border-white/15 pb-4">
+                <div>
+                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-yellow-400">
+                    Project gallery
+                  </p>
+                  <h3 className="mt-2 text-xl font-black uppercase sm:text-2xl">
+                    {selectedProject.title}
+                  </h3>
+                </div>
+
                 <button
+                  type="button"
                   onClick={closeGallery}
-                  className="w-10 h-10 flex items-center justify-center border-2 border-white bg-red-500 text-white font-black hover:bg-white hover:text-red-500 transition-colors"
+                  aria-label="Close gallery"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center border border-white/50 text-xl font-black transition-colors hover:border-yellow-400 hover:bg-yellow-400 hover:text-black"
                 >
-                  X
+                  ×
                 </button>
               </div>
 
-              {/* Gallery Content Area */}
-              <div className="relative w-full min-h-[40vh] md:min-h-[60vh] flex items-center justify-center bg-black border-2 border-neutral-800 p-4">
-                {/* Kondisi jika array image kosong */}
-                {!selectedProject.images ||
-                selectedProject.images.length === 0 ? (
-                  <p className="text-neutral-500 font-medium text-center">
-                    You don't have any image for this project yet.
-                  </p>
-                ) : (
-                  /* Tampilan Gambar */
-                  <div className="relative w-full h-full flex items-center justify-center group">
-                    {/* Tombol Kiri (Muncul jika gambar > 1) */}
-                    {selectedProject.images.length > 1 && (
-                      <button
-                        onClick={prevImage}
-                        className="absolute left-4 z-10 w-12 h-12 flex items-center justify-center bg-yellow-400 border-[3px] border-black text-black font-black text-xl hover:bg-white transition-colors"
-                      >
-                        ←
-                      </button>
-                    )}
-
-                    {/* Gambar Aktif */}
+              <div className="relative flex min-h-[42vh] items-center justify-center border border-white/10 bg-black p-3 sm:min-h-[60vh] sm:p-6">
+                {selectedProject.images?.length ? (
+                  <>
                     <img
                       src={selectedProject.images[currentImageIndex]}
                       alt={`${selectedProject.title} screenshot ${currentImageIndex + 1}`}
-                      className="max-w-full max-h-[60vh] object-contain border-2 border-neutral-800"
+                      className="max-h-[65vh] max-w-full object-contain"
                     />
 
-                    {/* Tombol Kanan (Muncul jika gambar > 1) */}
                     {selectedProject.images.length > 1 && (
-                      <button
-                        onClick={nextImage}
-                        className="absolute right-4 z-10 w-12 h-12 flex items-center justify-center bg-yellow-400 border-[3px] border-black text-black font-black text-xl hover:bg-white transition-colors"
-                      >
-                        →
-                      </button>
-                    )}
+                      <>
+                        <button
+                          type="button"
+                          onClick={prevImage}
+                          aria-label="Previous image"
+                          className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-black bg-yellow-400 text-xl font-black text-black transition-colors hover:bg-white sm:left-5 sm:h-12 sm:w-12"
+                        >
+                          ←
+                        </button>
 
-                    {/* Image Counter */}
-                    {selectedProject.images.length > 1 && (
-                      <div className="absolute bottom-4 bg-black/80 text-yellow-400 px-4 py-1 border-2 border-yellow-400 font-bold text-sm">
-                        {currentImageIndex + 1} /{" "}
-                        {selectedProject.images.length}
-                      </div>
+                        <button
+                          type="button"
+                          onClick={nextImage}
+                          aria-label="Next image"
+                          className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-black bg-yellow-400 text-xl font-black text-black transition-colors hover:bg-white sm:right-5 sm:h-12 sm:w-12"
+                        >
+                          →
+                        </button>
+
+                        <span className="absolute bottom-3 left-1/2 -translate-x-1/2 border border-yellow-400 bg-black/90 px-3 py-1 text-[10px] font-black tracking-wider text-yellow-400">
+                          {currentImageIndex + 1} /{" "}
+                          {selectedProject.images.length}
+                        </span>
+                      </>
                     )}
-                  </div>
+                  </>
+                ) : (
+                  <p className="text-sm text-neutral-500">
+                    No project images are available yet.
+                  </p>
                 )}
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </PortfolioPageLayout>
   );
 }
