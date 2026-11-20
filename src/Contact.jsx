@@ -233,8 +233,8 @@ export default function Contact() {
                   </motion.p>
                 )}
 
-                <p className="text-[10px] leading-5 text-neutral-600">
-                  Yes u can actually use this to email me and i'll read it since
+                <p className="text-[12px] leading-5 text-neutral-400">
+                  Yes u can actually use this to email me and I'll read it since
                   I'm still unemployed, try it
                 </p>
               </form>
