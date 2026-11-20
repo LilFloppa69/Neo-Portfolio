@@ -234,8 +234,8 @@ export default function Contact() {
                 )}
 
                 <p className="text-[10px] leading-5 text-neutral-600">
-                  Form preview only. Connect an email service or backend
-                  endpoint before using this form to receive real messages.
+                  Yes u can actually use this to email me and i'll read it since
+                  I'm still unemployed, try it
                 </p>
               </form>
             </div>
