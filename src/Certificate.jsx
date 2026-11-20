@@ -257,7 +257,7 @@ export default function Certificate() {
                           onClick={() => openImageModal(certificate.image)}
                           className="border border-white/35 px-3 py-2 text-[9px] font-black uppercase tracking-[0.14em] text-white transition-colors hover:border-yellow-400 hover:bg-yellow-400 hover:text-black"
                         >
-                          Main certificate ↗
+                          View Certificate
                         </button>
                       </div>
                     </div>

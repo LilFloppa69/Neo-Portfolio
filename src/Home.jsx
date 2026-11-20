@@ -1,11 +1,15 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
 import {
   AnimatePresence,
   motion,
+  useInView,
   useMotionValueEvent,
+  useReducedMotion,
   useScroll,
   useTransform,
 } from "framer-motion";
+
 import { Link } from "react-router-dom";
 import SignatureReveal from "./components/SignatureReveal";
 
@@ -72,6 +76,10 @@ const featuredProjects = [
   },
 ];
 
+/* -------------------------------------------------------
+   ICON
+------------------------------------------------------- */
+
 function ArrowIcon({ className = "h-5 w-5" }) {
   return (
     <svg
@@ -89,6 +97,10 @@ function ArrowIcon({ className = "h-5 w-5" }) {
   );
 }
 
+/* -------------------------------------------------------
+   SECTION LABEL
+------------------------------------------------------- */
+
 function SectionEyebrow({ number, children }) {
   return (
     <div className="mb-7 flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.24em] text-neutral-400 md:text-xs">
@@ -99,13 +111,104 @@ function SectionEyebrow({ number, children }) {
   );
 }
 
-function Reveal({ children, className = "", delay = 0, ...props }) {
+/* -------------------------------------------------------
+   DIRECTIONAL SCROLL REVEAL
+
+   DOWN:
+   Enter from bottom -> visible -> exit upward.
+
+   UP:
+   Enter from top -> visible -> exit downward.
+
+   Every component can repeat its animation.
+------------------------------------------------------- */
+
+function Reveal({
+  children,
+  className = "",
+  delay = 0,
+  distance = 46,
+  ...props
+}) {
+  const ref = useRef(null);
+  const wasInView = useRef(false);
+  const direction = useRef("down");
+
+  const { scrollY } = useScroll();
+
+  const isInView = useInView(ref, {
+    once: false,
+    amount: 0.12,
+    margin: "-8% 0px -8% 0px",
+  });
+
+  const reduceMotion = useReducedMotion();
+
+  const [phase, setPhase] = useState("hiddenBottom");
+
+  // Detect current scroll direction without triggering
+  // React renders on every scroll frame.
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const previous = scrollY.getPrevious();
+
+    if (previous === undefined) return;
+
+    const delta = latest - previous;
+
+    if (Math.abs(delta) > 0.5) {
+      direction.current = delta > 0 ? "down" : "up";
+    }
+  });
+
+  // Enter and exit according to scroll direction.
+  useEffect(() => {
+    if (isInView && !wasInView.current) {
+      setPhase("visible");
+    } else if (!isInView && wasInView.current) {
+      setPhase(direction.current === "down" ? "hiddenTop" : "hiddenBottom");
+    }
+
+    wasInView.current = isInView;
+  }, [isInView]);
+
+  const variants = {
+    hiddenBottom: reduceMotion
+      ? { opacity: 0 }
+      : {
+          opacity: 0,
+          y: distance,
+          scale: 0.985,
+          filter: "blur(7px)",
+        },
+
+    hiddenTop: reduceMotion
+      ? { opacity: 0 }
+      : {
+          opacity: 0,
+          y: -distance,
+          scale: 0.985,
+          filter: "blur(7px)",
+        },
+
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      filter: "blur(0px)",
+    },
+  };
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 42 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.18 }}
-      transition={{ duration: 0.7, delay, ease }}
+      ref={ref}
+      initial="hiddenBottom"
+      animate={phase}
+      variants={variants}
+      transition={{
+        duration: reduceMotion ? 0.15 : 0.72,
+        delay: phase === "visible" ? delay : 0,
+        ease,
+      }}
       className={className}
       {...props}
     >
@@ -114,27 +217,45 @@ function Reveal({ children, className = "", delay = 0, ...props }) {
   );
 }
 
+/* -------------------------------------------------------
+   HOME
+------------------------------------------------------- */
+
 export default function Home() {
   const { scrollY, scrollYProgress } = useScroll();
+
   const heroSequenceRef = useRef(null);
+
   const { scrollYProgress: heroProgress } = useScroll({
     target: heroSequenceRef,
     offset: ["start start", "end end"],
   });
+
   const [showQuickNav, setShowQuickNav] = useState(false);
 
-  // The hero stays pinned while its top/bottom rails minimize and the signature
-  // is progressively drawn by the user's scroll position.
+  /* HERO SCROLL TRANSITIONS */
+
   const heroTopY = useTransform(heroProgress, [0, 0.34], [0, -18]);
+
   const heroTopScale = useTransform(heroProgress, [0, 0.34], [1, 0.78]);
+
   const heroTopOpacity = useTransform(heroProgress, [0, 0.34], [1, 0.76]);
+
   const heroBottomY = useTransform(heroProgress, [0, 0.34], [0, 18]);
+
   const heroBottomScale = useTransform(heroProgress, [0, 0.34], [1, 0.78]);
+
   const heroBottomOpacity = useTransform(heroProgress, [0, 0.34], [1, 0.62]);
+
   const heroMainY = useTransform(heroProgress, [0, 0.4], [0, -24]);
+
   const heroMainScale = useTransform(heroProgress, [0, 0.4], [1, 0.82]);
+
   const heroMainOpacity = useTransform(heroProgress, [0.08, 0.4], [1, 0.07]);
+
   const heroImageY = useTransform(heroProgress, [0, 0.42], [0, 55]);
+
+  /* SIGNATURE */
 
   const signatureProgress = useTransform(heroProgress, [0.22, 0.56], [0, 1]);
 
@@ -146,16 +267,22 @@ export default function Home() {
     [0, 1, 1, 1],
   );
 
-  const signatureScale = useTransform(heroProgress, [0.18, 0.62], [0.92, 1]);
+  const signatureScale = useTransform(heroProgress, [0.18, 0.56], [0.92, 1]);
+
+  /* FLOATING NAVIGATION */
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setShowQuickNav(latest > window.innerHeight * 2.05);
   });
 
+  /* SCROLL BUTTON */
+
   const scrollToIntro = () => {
     if (!heroSequenceRef.current) return;
+
     const sequenceTop =
       heroSequenceRef.current.getBoundingClientRect().top + window.scrollY;
+
     window.scrollTo({
       top: sequenceTop + window.innerHeight * 0.72,
       behavior: "smooth",
@@ -164,21 +291,38 @@ export default function Home() {
 
   return (
     <main className="relative w-full overflow-clip bg-[#080808] text-white">
-      {/* Scroll progress */}
+      {/* SCROLL PROGRESS */}
+
       <motion.div
         className="fixed left-0 right-0 top-0 z-[70] h-[3px] origin-left bg-yellow-400"
         style={{ scaleX: scrollYProgress }}
       />
 
-      {/* Compact floating navigation appears after the hero */}
+      {/* FLOATING NAVIGATION */}
+
       <AnimatePresence>
         {showQuickNav && (
           <motion.nav
             aria-label="Quick navigation"
-            initial={{ opacity: 0, y: 24, x: "-50%" }}
-            animate={{ opacity: 1, y: 0, x: "-50%" }}
-            exit={{ opacity: 0, y: 18, x: "-50%" }}
-            transition={{ duration: 0.35, ease }}
+            initial={{
+              opacity: 0,
+              y: 24,
+              x: "-50%",
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              x: "-50%",
+            }}
+            exit={{
+              opacity: 0,
+              y: 18,
+              x: "-50%",
+            }}
+            transition={{
+              duration: 0.35,
+              ease,
+            }}
             className="fixed bottom-5 left-1/2 z-[60] flex max-w-[calc(100vw-24px)] items-center gap-1 overflow-x-auto border border-white/15 bg-[#111]/90 p-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl md:bottom-7 md:gap-2 md:p-2"
           >
             {quickLinks.map((item) => (
@@ -188,6 +332,7 @@ export default function Home() {
                 className="flex shrink-0 items-center gap-2 px-3 py-2 text-[10px] font-black uppercase tracking-[0.12em] text-neutral-300 transition-colors hover:bg-yellow-400 hover:text-black md:px-4 md:text-[11px]"
               >
                 <span className="text-yellow-400">{item.number}</span>
+
                 {item.label}
               </Link>
             ))}
@@ -195,14 +340,23 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* HERO */}
+      {/* ================================================
+          HERO
+      ================================================ */}
+
       <section ref={heroSequenceRef} className="relative h-[220svh]">
         <div className="sticky top-0 flex h-[100svh] flex-col overflow-hidden px-5 pb-5 pt-4 sm:px-8 sm:pb-10 sm:pt-6 md:px-12 lg:px-[7vw]">
+          {/* BACKGROUND */}
+
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
             <div className="absolute -right-32 top-24 h-[420px] w-[420px] rounded-full bg-yellow-400/[0.07] blur-[120px]" />
+
             <div className="absolute -left-40 bottom-0 h-[360px] w-[360px] rounded-full bg-white/[0.035] blur-[110px]" />
+
             <div className="absolute inset-0 opacity-[0.035] [background-image:linear-gradient(rgba(255,255,255,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.7)_1px,transparent_1px)] [background-size:72px_72px]" />
           </div>
+
+          {/* HEADER */}
 
           <motion.header
             style={{
@@ -210,7 +364,7 @@ export default function Home() {
               scale: heroTopScale,
               opacity: heroTopOpacity,
             }}
-            className="relative z-30 origin-top flex items-center justify-between border-b border-white/15 pb-5"
+            className="relative z-30 flex origin-top items-center justify-between border-b border-white/15 pb-5"
           >
             <Link
               to="/"
@@ -220,14 +374,17 @@ export default function Home() {
               <span className="flex h-9 w-9 items-center justify-center border-2 border-yellow-400 text-sm font-black text-yellow-400 transition-colors group-hover:bg-yellow-400 group-hover:text-black">
                 Y.
               </span>
+
               <span className="text-xs font-black uppercase tracking-[0.2em] text-white">
                 Yazid<span className="text-yellow-400">.</span>Portfolio
               </span>
             </Link>
+
             <div className="hidden items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400 sm:flex">
               <span className="h-2 w-2 animate-pulse rounded-full bg-yellow-400" />
               Open to work · Medan, ID
             </div>
+
             <Link
               to="/contact"
               className="border border-white/35 px-3 py-2 text-[10px] font-black uppercase tracking-[0.16em] transition-all hover:border-yellow-400 hover:bg-yellow-400 hover:text-black sm:px-4 sm:text-[11px]"
@@ -235,6 +392,8 @@ export default function Home() {
               Let&apos;s talk <span className="ml-1 text-yellow-400">↗</span>
             </Link>
           </motion.header>
+
+          {/* MAIN HERO */}
 
           <motion.div
             style={{
@@ -260,53 +419,46 @@ export default function Home() {
                 variants={{
                   hidden: {},
                   visible: {
-                    transition: { staggerChildren: 0.12, delayChildren: 0.18 },
+                    transition: {
+                      staggerChildren: 0.12,
+                      delayChildren: 0.18,
+                    },
                   },
                 }}
                 className="max-w-[1050px] text-[clamp(3.25rem,8.8vw,8.8rem)] font-black uppercase leading-[0.82] tracking-[-0.075em]"
               >
-                <motion.span
-                  variants={{
-                    hidden: { opacity: 0, y: 70, skewY: 5 },
-                    visible: {
-                      opacity: 1,
-                      y: 0,
-                      skewY: 0,
-                      transition: { duration: 0.8, ease },
-                    },
-                  }}
-                  className="block"
-                >
-                  Yazid Chairy
-                </motion.span>
-                <motion.span
-                  variants={{
-                    hidden: { opacity: 0, y: 70, skewY: 5 },
-                    visible: {
-                      opacity: 1,
-                      y: 0,
-                      skewY: 0,
-                      transition: { duration: 0.8, ease },
-                    },
-                  }}
-                  className="mt-2 block text-transparent [-webkit-text-stroke:1px_rgba(255,255,255,0.78)] sm:[-webkit-text-stroke:2px_rgba(255,255,255,0.78)]"
-                >
-                  Syahputra
-                </motion.span>
-                <motion.span
-                  variants={{
-                    hidden: { opacity: 0, y: 70, skewY: 5 },
-                    visible: {
-                      opacity: 1,
-                      y: 0,
-                      skewY: 0,
-                      transition: { duration: 0.8, ease },
-                    },
-                  }}
-                  className="mt-2 block text-yellow-400"
-                >
-                  Nasution.
-                </motion.span>
+                {["Yazid Chairy", "Syahputra", "Nasution."].map(
+                  (line, index) => (
+                    <motion.span
+                      key={line}
+                      variants={{
+                        hidden: {
+                          opacity: 0,
+                          y: 70,
+                          skewY: 5,
+                        },
+                        visible: {
+                          opacity: 1,
+                          y: 0,
+                          skewY: 0,
+                          transition: {
+                            duration: 0.8,
+                            ease,
+                          },
+                        },
+                      }}
+                      className={`block ${
+                        index === 1
+                          ? "mt-2 text-transparent [-webkit-text-stroke:1px_rgba(255,255,255,0.78)] sm:[-webkit-text-stroke:2px_rgba(255,255,255,0.78)]"
+                          : index === 2
+                            ? "mt-2 text-yellow-400"
+                            : ""
+                      }`}
+                    >
+                      {line}
+                    </motion.span>
+                  ),
+                )}
               </motion.h1>
 
               <motion.div
@@ -319,11 +471,13 @@ export default function Home() {
                   <p className="text-sm font-bold uppercase tracking-[0.16em] text-white sm:text-base">
                     Full Stack Developer
                   </p>
+
                   <p className="mt-2 max-w-md text-sm leading-relaxed text-neutral-400">
                     I build digital experiences through code, thoughtful design,
                     and curiosity.
                   </p>
                 </div>
+
                 <button
                   type="button"
                   onClick={scrollToIntro}
@@ -337,42 +491,60 @@ export default function Home() {
               </motion.div>
             </motion.div>
 
+            {/* PORTRAIT */}
+
             <motion.div
               style={{ y: heroImageY }}
-              initial={{ opacity: 0, scale: 0.92, rotate: 3 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              initial={{
+                opacity: 0,
+                scale: 0.92,
+                rotate: 3,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                rotate: 0,
+              }}
               transition={{ duration: 1, delay: 0.35, ease }}
               className="relative mx-auto w-full max-w-[220px] sm:max-w-[300px] md:ml-auto md:mr-0 md:mt-8 md:max-w-[390px]"
             >
               <div className="absolute -right-3 -top-3 h-full w-full border border-yellow-400/70 sm:-right-5 sm:-top-5" />
+
               <div className="relative aspect-[4/5] overflow-hidden border-[3px] border-white bg-neutral-900 shadow-[10px_10px_0_0_#facc15] sm:shadow-[16px_16px_0_0_#facc15]">
                 <img
                   src="/Images/profil.jpeg"
                   alt="Portrait of Yazid Chairy Syahputra Nasution"
                   className="h-full w-full object-cover object-center grayscale transition duration-700 hover:scale-105 hover:grayscale-0"
                 />
+
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/45 to-transparent p-5 pt-20">
                   <p className="text-[10px] font-black uppercase tracking-[0.24em] text-yellow-400">
                     The person behind the pixels
                   </p>
+
                   <p className="mt-1 text-xl font-black uppercase tracking-tight">
                     Yazid C. S. N.
                   </p>
                 </div>
               </div>
+
               <div className="absolute -bottom-10 -left-5 hidden border border-white/20 bg-[#111] px-4 py-3 sm:block">
                 <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-neutral-500">
                   Currently based
                 </p>
+
                 <p className="mt-1 text-xs font-black uppercase tracking-wider">
                   Medan, Indonesia
                 </p>
               </div>
+
               <span className="absolute -right-5 top-10 hidden rotate-90 text-[9px] font-black uppercase tracking-[0.35em] text-neutral-500 lg:block">
                 Scroll to explore —
               </span>
             </motion.div>
           </motion.div>
+
+          {/* BOTTOM RAIL */}
 
           <motion.div
             style={{
@@ -380,14 +552,18 @@ export default function Home() {
               scale: heroBottomScale,
               opacity: heroBottomOpacity,
             }}
-            className="relative z-30 origin-bottom flex items-center justify-between border-t border-white/15 pt-4 text-[9px] font-bold uppercase tracking-[0.2em] text-neutral-500 sm:text-[10px]"
+            className="relative z-30 flex origin-bottom items-center justify-between border-t border-white/15 pt-4 text-[9px] font-bold uppercase tracking-[0.2em] text-neutral-500 sm:text-[10px]"
           >
             <span>Developer · Analyst · Designer</span>
+
             <span className="flex items-center gap-2">
               Scroll to discover <span className="text-yellow-400">↓</span>
             </span>
+
             <span className="hidden sm:block">01 / 04</span>
           </motion.div>
+
+          {/* SIGNATURE */}
 
           <SignatureReveal
             progress={signatureProgress}
@@ -398,7 +574,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* IDENTITY PREVIEW */}
+      {/* ================================================
+          01 — IDENTITY
+      ================================================ */}
+
       <section
         id="intro"
         className="relative scroll-mt-8 border-y border-white/10 bg-[#101010] px-5 py-24 sm:px-8 md:px-12 md:py-32 lg:px-[7vw]"
@@ -406,14 +585,17 @@ export default function Home() {
         <div className="mx-auto grid max-w-[1440px] gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-24">
           <Reveal>
             <SectionEyebrow number="01">A little introduction</SectionEyebrow>
+
             <h2 className="max-w-xl text-5xl font-black uppercase leading-[0.9] tracking-[-0.06em] sm:text-6xl md:text-7xl">
               More than
               <span className="block text-yellow-400">just a title.</span>
             </h2>
+
             <p className="mt-7 max-w-sm text-sm leading-7 text-neutral-400">
               A quick look at who I am, what I explore, and the way I approach
               building digital products.
             </p>
+
             <Link
               to="/identity"
               className="group mt-8 inline-flex items-center gap-4 border-b-2 border-white pb-3 text-xs font-black uppercase tracking-[0.18em] transition-colors hover:border-yellow-400 hover:text-yellow-400"
@@ -423,18 +605,21 @@ export default function Home() {
             </Link>
           </Reveal>
 
-          <Reveal delay={0.12} className="relative">
+          <Reveal delay={0.12} distance={55} className="relative">
             <div className="absolute -left-3 -top-3 h-full w-full border border-yellow-400/70 sm:-left-4 sm:-top-4" />
+
             <div className="relative border border-white/20 bg-[#080808] p-6 sm:p-9 md:p-10">
               <div className="flex flex-wrap items-start justify-between gap-4 border-b border-white/15 pb-6">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-[0.24em] text-yellow-400">
                     Identity snapshot
                   </p>
+
                   <h3 className="mt-3 text-2xl font-black uppercase tracking-tight sm:text-3xl">
                     Yazid Chairy Syahputra Nasution
                   </h3>
                 </div>
+
                 <span className="border border-yellow-400 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.16em] text-yellow-400">
                   Open to work
                 </span>
@@ -451,14 +636,17 @@ export default function Home() {
                   <p className="text-[9px] font-black uppercase tracking-[0.2em] text-neutral-500">
                     Based in
                   </p>
+
                   <p className="mt-2 text-sm font-bold text-white">
                     Medan, Indonesia
                   </p>
                 </div>
+
                 <div>
                   <p className="text-[9px] font-black uppercase tracking-[0.2em] text-neutral-500">
                     Primary focus
                   </p>
+
                   <p className="mt-2 text-sm font-bold text-white">
                     Full Stack Web Development
                   </p>
@@ -480,17 +668,22 @@ export default function Home() {
         </div>
       </section>
 
-      {/* AREAS OF INTEREST */}
+      {/* ================================================
+          02 — AREAS OF INTEREST
+      ================================================ */}
+
       <section className="relative px-5 py-24 sm:px-8 md:px-12 md:py-32 lg:px-[7vw]">
         <div className="mx-auto max-w-[1440px]">
           <Reveal className="mb-12 flex flex-col justify-between gap-6 md:mb-16 md:flex-row md:items-end">
             <div>
               <SectionEyebrow number="02">What I explore</SectionEyebrow>
+
               <h2 className="max-w-3xl text-5xl font-black uppercase leading-[0.9] tracking-[-0.06em] sm:text-6xl md:text-7xl">
                 Ideas into
                 <span className="text-yellow-400"> experiences.</span>
               </h2>
             </div>
+
             <p className="max-w-xs text-sm leading-7 text-neutral-400">
               A few areas that shape my curiosity and the kind of digital work I
               enjoy exploring.
@@ -499,20 +692,24 @@ export default function Home() {
 
           <div className="grid gap-4 md:grid-cols-3">
             {focusAreas.map((area, index) => (
-              <Reveal key={area.number} delay={index * 0.1}>
+              <Reveal key={area.number} delay={index * 0.1} distance={52}>
                 <article className="group flex h-full min-h-[300px] flex-col border border-white/20 bg-[#101010] p-6 transition-all duration-300 hover:-translate-y-2 hover:border-yellow-400 hover:bg-[#151515] sm:p-8">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-black text-yellow-400">
                       /{area.number}
                     </span>
+
                     <ArrowIcon className="h-5 w-5 text-neutral-600 transition-all group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-yellow-400" />
                   </div>
+
                   <h3 className="mt-14 text-2xl font-black uppercase leading-tight tracking-tight sm:text-3xl">
                     {area.title}
                   </h3>
+
                   <p className="mt-4 flex-1 text-sm leading-7 text-neutral-400">
                     {area.description}
                   </p>
+
                   <div className="mt-7 flex flex-wrap gap-2">
                     {area.tags.map((tag) => (
                       <span
@@ -530,29 +727,34 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SELECTED WORK */}
+      {/* ================================================
+          03 — SELECTED WORK
+      ================================================ */}
+
       <section className="relative border-y border-white/10 bg-[#101010] px-5 py-24 sm:px-8 md:px-12 md:py-32 lg:px-[7vw]">
         <div className="mx-auto max-w-[1440px]">
           <Reveal className="mb-12 flex flex-col justify-between gap-6 md:mb-16 md:flex-row md:items-end">
             <div>
               <SectionEyebrow number="03">Selected work</SectionEyebrow>
+
               <h2 className="text-5xl font-black uppercase leading-[0.9] tracking-[-0.06em] sm:text-6xl md:text-7xl">
                 A few things
                 <span className="block text-yellow-400">I&apos;ve built.</span>
               </h2>
             </div>
+
             <Link
               to="/portfolio"
               className="group inline-flex w-fit items-center gap-3 border-b border-white pb-3 text-xs font-black uppercase tracking-[0.18em] transition-colors hover:border-yellow-400 hover:text-yellow-400"
             >
-              View all projects{" "}
+              View all projects
               <ArrowIcon className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
             </Link>
           </Reveal>
 
           <div className="grid gap-5 lg:grid-cols-3">
             {featuredProjects.map((project, index) => (
-              <Reveal key={project.number} delay={index * 0.1}>
+              <Reveal key={project.number} delay={index * 0.1} distance={58}>
                 <Link to="/portfolio" className="group block h-full">
                   <article className="h-full border border-white/20 bg-[#080808] transition-all duration-300 group-hover:-translate-y-2 group-hover:border-yellow-400">
                     <div className="relative aspect-[5/3] overflow-hidden border-b border-white/15 bg-neutral-900">
@@ -562,20 +764,25 @@ export default function Home() {
                         loading="lazy"
                         className="h-full w-full object-cover opacity-75 transition duration-700 group-hover:scale-105 group-hover:opacity-100"
                       />
+
                       <span className="absolute left-4 top-4 border border-white/40 bg-black/75 px-2.5 py-1.5 text-[9px] font-black tracking-[0.16em] text-white">
                         {project.number}
                       </span>
+
                       <span className="absolute bottom-4 right-4 flex h-10 w-10 items-center justify-center border border-white/60 bg-black/70 text-white transition-colors group-hover:border-yellow-400 group-hover:bg-yellow-400 group-hover:text-black">
                         <ArrowIcon />
                       </span>
                     </div>
+
                     <div className="p-6">
                       <p className="text-[9px] font-black uppercase tracking-[0.2em] text-yellow-400">
                         {project.category}
                       </p>
+
                       <h3 className="mt-3 text-2xl font-black uppercase tracking-tight">
                         {project.title}
                       </h3>
+
                       <p className="mt-3 text-sm leading-7 text-neutral-400">
                         {project.description}
                       </p>
@@ -588,16 +795,21 @@ export default function Home() {
         </div>
       </section>
 
-      {/* EXPLORE MORE / NAVIGATION */}
+      {/* ================================================
+          04 — KEEP EXPLORING
+      ================================================ */}
+
       <section className="relative px-5 py-24 sm:px-8 md:px-12 md:py-32 lg:px-[7vw]">
         <div className="mx-auto max-w-[1440px]">
           <Reveal>
             <SectionEyebrow number="04">Keep exploring</SectionEyebrow>
+
             <div className="flex flex-col justify-between gap-6 border-b border-white/20 pb-10 md:flex-row md:items-end">
               <h2 className="max-w-3xl text-5xl font-black uppercase leading-[0.9] tracking-[-0.06em] sm:text-6xl md:text-8xl">
                 Where to
                 <span className="text-yellow-400"> next?</span>
               </h2>
+
               <p className="max-w-xs text-sm leading-7 text-neutral-400">
                 Choose a section and take a closer look around my work and
                 background.
@@ -607,31 +819,40 @@ export default function Home() {
 
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {quickLinks.map((item, index) => (
-              <Reveal key={item.path} delay={index * 0.08}>
+              <Reveal key={item.path} delay={index * 0.08} distance={40}>
                 <Link
                   to={item.path}
                   className="group flex items-center justify-between border border-white/20 bg-[#101010] p-5 transition-all duration-300 hover:border-yellow-400 hover:bg-yellow-400 hover:text-black sm:p-7"
                 >
                   <div className="flex items-center gap-5 sm:gap-7">
                     <span className="text-xs font-black text-yellow-400 transition-colors group-hover:text-black">
-                      {item.number}
+                      /{item.number}
                     </span>
+
                     <span className="text-xl font-black uppercase tracking-tight sm:text-2xl">
                       {item.label}
                     </span>
                   </div>
+
                   <ArrowIcon className="h-5 w-5 text-neutral-500 transition-all group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-black" />
                 </Link>
               </Reveal>
             ))}
           </div>
 
-          <Reveal className="mt-20 flex flex-col justify-between gap-6 border-t border-white/15 pt-6 text-[9px] font-bold uppercase tracking-[0.2em] text-neutral-500 sm:flex-row sm:items-center sm:text-[10px]">
+          {/* FOOTER */}
+
+          <Reveal
+            delay={0.08}
+            className="mt-20 flex flex-col justify-between gap-6 border-t border-white/15 pt-6 text-[9px] font-bold uppercase tracking-[0.2em] text-neutral-500 sm:flex-row sm:items-center sm:text-[10px]"
+          >
             <span>© 2026 Yazid Chairy Syahputra Nasution</span>
+
             <span>
               Designed with curiosity · Built with intention · And also we do a
               little trolling
             </span>
+
             <Link
               to="/contact"
               className="w-fit text-white transition-colors hover:text-yellow-400"

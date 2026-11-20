@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-
+import emailjs from "@emailjs/browser";
 import PortfolioPageLayout, { Reveal } from "./components/PortfolioPageLayout";
 
 const contactDetails = [
@@ -19,14 +19,32 @@ const contactDetails = [
 ];
 
 export default function Contact() {
+  const [isSending, setIsSending] = useState(false);
   const [notice, setNotice] = useState("");
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    setNotice(
-      "This form is a front-end preview. No message was sent because an email service has not been connected yet.",
-    );
+    const form = event.currentTarget;
+
+    setIsSending(true);
+    setNotice("");
+
+    try {
+      await emailjs.sendForm("service_formepeasant", "template_hk7qrdk", form, {
+        publicKey: "V-e1G5T70v0Sfsnu-",
+      });
+
+      setNotice("Message sent successfully! Thank you for reaching out.");
+
+      form.reset();
+    } catch (error) {
+      console.error("EmailJS error:", error);
+
+      setNotice("Failed to send your message. Please try again.");
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -196,12 +214,12 @@ export default function Contact() {
 
                 <button
                   type="submit"
-                  className="group flex w-full items-center justify-between border border-yellow-400 bg-yellow-400 px-5 py-4 text-left text-[10px] font-black uppercase tracking-[0.18em] text-black transition-colors hover:border-white hover:bg-white"
+                  disabled={isSending}
+                  className="group flex w-full items-center justify-between border border-yellow-400 bg-yellow-400 px-5 py-4 text-left text-[10px] font-black uppercase tracking-[0.18em] text-black transition-colors hover:border-white hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Preview submission
-                  <span className="text-xl transition-transform group-hover:translate-x-1">
-                    ↗
-                  </span>
+                  {isSending ? "Sending message..." : "Send message"}
+
+                  <span className="text-xl">{isSending ? "..." : "↗"}</span>
                 </button>
 
                 {notice && (

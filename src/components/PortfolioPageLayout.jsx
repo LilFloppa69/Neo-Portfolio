@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 const pageLinks = [
   { number: "01", label: "Identity", path: "/identity" },
@@ -9,6 +10,184 @@ const pageLinks = [
 ];
 
 const ease = [0.22, 1, 0.36, 1];
+
+/* -------------------------------------------------------
+   DYNAMIC ISLAND NAVIGATION
+
+   IDLE:
+   Small floating pill with a jumping yellow dot.
+
+   HOVER:
+   Activates within a wide invisible proximity area.
+
+   EXPANDED:
+   Four navigation links appear with spring animation.
+
+   MOBILE:
+   Tap the dot to toggle navigation.
+------------------------------------------------------- */
+
+function DynamicIslandNav({ activePath }) {
+  const [expanded, setExpanded] = useState(false);
+  const reduceMotion = useReducedMotion();
+
+  const closeIfFocusLeaves = (event) => {
+    if (!event.currentTarget.contains(event.relatedTarget)) {
+      setExpanded(false);
+    }
+  };
+
+  return (
+    <div
+      className="fixed left-1/2 top-0 z-[100] flex h-[105px] w-[520px] max-w-[calc(100vw-16px)] -translate-x-1/2 justify-center pt-3"
+      onMouseEnter={() => setExpanded(true)}
+      onMouseLeave={() => setExpanded(false)}
+      onFocusCapture={() => setExpanded(true)}
+      onBlurCapture={closeIfFocusLeaves}
+    >
+      <motion.nav
+        layout
+        aria-label="Main navigation"
+        transition={{
+          layout: {
+            type: "spring",
+            stiffness: 420,
+            damping: 34,
+            mass: 0.8,
+          },
+        }}
+        className={`relative flex h-[52px] max-w-full items-center justify-center overflow-hidden rounded-full border border-white/15 bg-[#101010]/95 shadow-[0_12px_45px_rgba(0,0,0,0.55)] backdrop-blur-2xl ${
+          expanded ? "w-fit gap-1 px-2" : "w-[68px] px-1"
+        }`}
+      >
+        {/* ANIMATED DOT / ISLAND TRIGGER */}
+
+        <motion.button
+          type="button"
+          aria-label={expanded ? "Collapse navigation" : "Expand navigation"}
+          aria-expanded={expanded}
+          aria-controls="dynamic-island-links"
+          onClick={() => setExpanded((previous) => !previous)}
+          whileTap={reduceMotion ? undefined : { scale: 0.88 }}
+          className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+        >
+          {/* Soft ambient glow */}
+
+          <motion.span
+            aria-hidden="true"
+            animate={
+              reduceMotion
+                ? { opacity: 0.3, scale: 1 }
+                : {
+                    opacity: [0.15, 0.5, 0.15],
+                    scale: [0.8, 1.5, 0.8],
+                  }
+            }
+            transition={{
+              duration: 2.2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="absolute h-6 w-6 rounded-full bg-yellow-400/30 blur-md"
+          />
+
+          {/* Jumping yellow dot */}
+
+          <motion.span
+            aria-hidden="true"
+            animate={
+              reduceMotion
+                ? { y: 0 }
+                : {
+                    y: [0, -8, 0],
+                    scaleY: [1, 0.9, 1],
+                  }
+            }
+            transition={{
+              duration: 0.48,
+              repeat: Infinity,
+              repeatDelay: 1.25,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            className="relative z-10 h-[9px] w-[9px] rounded-full bg-yellow-400 shadow-[0_0_12px_rgba(250,204,21,0.85)]"
+          />
+        </motion.button>
+
+        {/* EXPANDING NAVIGATION LINKS */}
+
+        <AnimatePresence initial={false}>
+          {expanded && (
+            <motion.div
+              id="dynamic-island-links"
+              initial={{
+                opacity: 0,
+                x: -12,
+                filter: "blur(5px)",
+              }}
+              animate={{
+                opacity: 1,
+                x: 0,
+                filter: "blur(0px)",
+              }}
+              exit={{
+                opacity: 0,
+                x: -8,
+                filter: "blur(4px)",
+              }}
+              transition={{
+                duration: 0.3,
+                ease,
+              }}
+              className="flex min-w-0 items-center gap-0.5"
+            >
+              {pageLinks.map((item, index) => {
+                const active = activePath === item.path;
+
+                return (
+                  <motion.div
+                    key={item.path}
+                    initial={
+                      reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }
+                    }
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 5 }}
+                    transition={{
+                      duration: 0.3,
+                      delay: index * 0.045,
+                      ease,
+                    }}
+                  >
+                    <Link
+                      to={item.path}
+                      aria-current={active ? "page" : undefined}
+                      className={`flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.1em] transition-colors sm:gap-2 sm:px-3 sm:text-[10px] ${
+                        active
+                          ? "bg-yellow-400 text-black"
+                          : "text-neutral-400 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      <span
+                        className={active ? "text-black/60" : "text-yellow-400"}
+                      >
+                        {item.number}
+                      </span>
+
+                      <span className="hidden sm:inline">{item.label}</span>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.nav>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------
+   SCROLL REVEAL
+------------------------------------------------------- */
 
 export function Reveal({ children, className = "", delay = 0, amount = 0.16 }) {
   return (
@@ -23,6 +202,10 @@ export function Reveal({ children, className = "", delay = 0, amount = 0.16 }) {
     </motion.div>
   );
 }
+
+/* -------------------------------------------------------
+   SECTION HEADING
+------------------------------------------------------- */
 
 export function SectionHeading({ number, label, title, accent, description }) {
   return (
@@ -48,6 +231,10 @@ export function SectionHeading({ number, label, title, accent, description }) {
   );
 }
 
+/* -------------------------------------------------------
+   PORTFOLIO PAGE LAYOUT
+------------------------------------------------------- */
+
 export default function PortfolioPageLayout({
   number,
   label,
@@ -60,6 +247,8 @@ export default function PortfolioPageLayout({
 
   return (
     <main className="relative isolate min-h-screen overflow-hidden bg-[#080808] text-white">
+      {/* BACKGROUND */}
+
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
@@ -71,7 +260,12 @@ export default function PortfolioPageLayout({
         <div className="absolute -left-40 top-[58%] h-[360px] w-[360px] rounded-full bg-white/[0.035] blur-[115px]" />
       </div>
 
+      {/* FIXED DYNAMIC ISLAND */}
+
+      <DynamicIslandNav activePath={location.pathname} />
+
       {/* HEADER */}
+
       <header className="relative z-10 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 border-b border-white/10 px-5 py-5 sm:px-8 md:px-12 lg:px-[7vw]">
         <Link
           to="/"
@@ -87,42 +281,18 @@ export default function PortfolioPageLayout({
           </span>
         </Link>
 
-        <nav
-          aria-label="Main navigation"
-          className="hidden items-center gap-1 lg:flex"
-        >
-          {pageLinks.map((item) => {
-            const active = location.pathname === item.path;
+        {/* LET'S TALK */}
 
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                aria-current={active ? "page" : undefined}
-                className={`flex items-center gap-2 px-3 py-2 text-[9px] font-black uppercase tracking-[0.14em] transition-colors ${
-                  active
-                    ? "bg-yellow-400 text-black"
-                    : "text-neutral-400 hover:bg-white/10 hover:text-white"
-                }`}
-              >
-                <span className={active ? "text-black/60" : "text-yellow-400"}>
-                  {item.number}
-                </span>
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <Link
+        {/* <Link
           to="/contact"
           className="shrink-0 border border-white/35 px-3 py-2 text-[9px] font-black uppercase tracking-[0.16em] transition-all hover:border-yellow-400 hover:bg-yellow-400 hover:text-black sm:px-4 sm:text-[10px]"
         >
           Let&apos;s talk <span className="ml-1 text-yellow-400">↗</span>
-        </Link>
+        </Link> */}
       </header>
 
       {/* PAGE HERO */}
+
       <section className="relative z-10 mx-auto max-w-[1440px] px-5 pb-14 pt-14 sm:px-8 md:px-12 md:pb-20 md:pt-20 lg:px-[7vw]">
         <motion.div
           initial={{ opacity: 0, y: 28 }}
@@ -153,6 +323,7 @@ export default function PortfolioPageLayout({
               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-neutral-500">
                 Personal portfolio · 2026
               </p>
+
               <p className="mt-2 text-xs font-bold uppercase tracking-wider text-white">
                 Medan, Indonesia
               </p>
@@ -163,6 +334,7 @@ export default function PortfolioPageLayout({
                 {number}
                 <span className="text-neutral-600">/04</span>
               </p>
+
               <p className="mt-1 text-[9px] font-bold uppercase tracking-[0.2em] text-neutral-500">
                 Scroll to explore ↓
               </p>
@@ -174,15 +346,19 @@ export default function PortfolioPageLayout({
       </section>
 
       {/* PAGE CONTENT */}
+
       <div className="relative z-10 mx-auto max-w-[1440px] px-5 pb-24 sm:px-8 md:px-12 lg:px-[7vw]">
         {children}
       </div>
 
       {/* FOOTER */}
+
       <footer className="relative z-10 border-t border-white/10 px-5 py-7 sm:px-8 md:px-12 lg:px-[7vw]">
         <div className="mx-auto flex max-w-[1440px] flex-col justify-between gap-4 text-[9px] font-bold uppercase tracking-[0.18em] text-neutral-500 sm:flex-row sm:items-center sm:text-[10px]">
           <span>© 2026 Yazid Chairy Syahputra Nasution</span>
+
           <span>Designed with curiosity · Built with intention</span>
+
           <Link
             to="/"
             className="w-fit text-white transition-colors hover:text-yellow-400"
