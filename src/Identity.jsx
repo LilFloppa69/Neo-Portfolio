@@ -161,7 +161,7 @@ export default function Identity() {
               </p>
 
               <p className="mt-2 text-3xl font-black uppercase tracking-tight sm:text-4xl">
-                Y. C. S. N.
+                Yazid C. S. N.
               </p>
 
               <div className="mt-5 flex items-center justify-between border-t border-white/25 pt-4 text-[9px] font-bold uppercase tracking-[0.18em] text-neutral-300">
