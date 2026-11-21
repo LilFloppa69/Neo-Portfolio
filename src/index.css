@@ -1,33 +1,142 @@
 @import "tailwindcss";
 
+/* =========================================
+   YCSN — GLOBAL DESIGN FOUNDATION
+   Natural · Editorial · Personal
+========================================= */
+
+:root {
+  color-scheme: dark;
+
+  /* Core colors */
+  --color-bg: #080808;
+  --color-surface: #101010;
+  --color-text: #f0eee8;
+  --color-muted: #a7a59f;
+  --color-line: rgba(255, 255, 255, 0.14);
+
+  /* Personal identity */
+  --color-accent: #facc15;
+  --color-signature: #ff263f;
+
+  /* Typography */
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+
+  --font-editorial:
+    "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+}
+
+/* =========================================
+   BASE
+========================================= */
+
 @layer base {
   html {
     scroll-behavior: smooth;
-    background: #080808;
+    scroll-padding-top: 5rem;
+    background-color: var(--color-bg);
   }
 
   body {
     min-width: 320px;
-    overflow-x: hidden;
-    background-color: #080808;
-    color: white;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    margin: 0;
+    overflow-x: clip;
+
+    background-color: var(--color-bg);
+    color: var(--color-text);
+
+    font-family: var(--font-sans);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.6;
+
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
     text-rendering: optimizeLegibility;
+    font-kerning: normal;
   }
 
-  ::selection {
-    color: #080808;
-    background: #facc15;
+  #root {
+    min-height: 100vh;
   }
+
+  /* More natural text wrapping */
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Images */
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  /* Form typography */
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  /* Interaction */
 
   a,
   button {
     -webkit-tap-highlight-color: transparent;
   }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+  }
+
+  /* Text selection */
+
+  ::selection {
+    color: var(--color-bg);
+    background: var(--color-accent);
+  }
 }
 
+/* =========================================
+   PERSONAL TYPOGRAPHY UTILITY
+
+   Use selectively for editorial accents.
+   Not intended for every heading.
+========================================= */
+
 @layer utilities {
+  .font-editorial {
+    font-family: var(--font-editorial);
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.035em;
+    text-transform: none;
+  }
+
+  /* Existing utilities — retained */
+
   .shadow-brutal {
     box-shadow: 6px 6px 0px 0px rgba(255, 255, 255, 1);
   }
@@ -36,6 +145,10 @@
     box-shadow: 10px 10px 0px 0px rgba(255, 255, 255, 1);
   }
 }
+
+/* =========================================
+   ACCESSIBILITY — REDUCED MOTION
+========================================= */
 
 @media (prefers-reduced-motion: reduce) {
   html {

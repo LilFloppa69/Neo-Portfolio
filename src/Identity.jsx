@@ -173,47 +173,37 @@ export default function Identity() {
         </Reveal>
       </section>
 
-      <section className="mt-24 sm:mt-32">
+      <section className="mt-28 sm:mt-36">
         <Reveal>
           <SectionHeading
             number="02"
-            label="Areas of interest"
-            title="What I"
-            accent="explore."
-            description="A few areas that shape my curiosity and the kind of digital work I enjoy exploring."
+            label="Things I enjoy"
+            title="What keeps"
+            accent="me curious."
+            description="These aren't fixed job titles. They're areas I enjoy learning about and bringing into the things I build."
           />
         </Reveal>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="border-t border-white/15">
           {focusAreas.map((area, index) => (
-            <Reveal key={area.number} delay={index * 0.08}>
-              <article className="group flex h-full min-h-[300px] flex-col border border-white/20 bg-[#101010] p-6 transition-all duration-300 hover:-translate-y-2 hover:border-yellow-400 hover:bg-[#141414] sm:p-8">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black text-yellow-400">
-                    /{area.number}
-                  </span>
-                  <span className="text-xl text-neutral-600 transition-colors group-hover:text-yellow-400">
-                    ↗
-                  </span>
-                </div>
+            <Reveal key={area.number} delay={index * 0.08} distance={22}>
+              <article className="grid gap-4 border-b border-white/10 py-8 md:grid-cols-[70px_0.9fr_1.1fr] md:items-start md:gap-8 md:py-10">
+                <span className="font-mono text-xs text-yellow-400">
+                  /{area.number}
+                </span>
 
-                <h3 className="mt-14 text-2xl font-black uppercase leading-tight tracking-tight sm:text-3xl">
+                <h3 className="max-w-sm text-2xl font-medium leading-tight tracking-[-0.04em] text-[#F0EEE8] sm:text-3xl">
                   {area.title}
                 </h3>
 
-                <p className="mt-4 flex-1 text-sm leading-7 text-neutral-400">
-                  {area.description}
-                </p>
+                <div>
+                  <p className="max-w-xl text-sm leading-8 text-neutral-400">
+                    {area.description}
+                  </p>
 
-                <div className="mt-7 flex flex-wrap gap-2">
-                  {area.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="border border-white/20 px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-neutral-300"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+                  <p className="mt-4 text-[11px] font-medium text-neutral-500">
+                    {area.tools}
+                  </p>
                 </div>
               </article>
             </Reveal>
@@ -221,22 +211,29 @@ export default function Identity() {
         </div>
       </section>
 
-      <Reveal className="mt-16">
+      <Reveal className="mt-24">
         <Link
           to="/portfolio"
-          className="group flex flex-col justify-between gap-5 border border-white/20 bg-yellow-400 p-6 text-black transition-colors hover:bg-white sm:flex-row sm:items-center sm:p-8"
+          className="group flex flex-col justify-between gap-5 border-t border-white/15 py-8 sm:flex-row sm:items-end"
         >
           <div>
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-black/60">
-              Continue exploring
+            <p className="text-[10px] font-medium tracking-wide text-neutral-500">
+              NEXT UP / 02
             </p>
-            <p className="mt-2 text-2xl font-black uppercase tracking-tight sm:text-3xl">
-              See what I&apos;ve built.
-            </p>
+
+            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.045em] text-[#F0EEE8] transition-colors group-hover:text-yellow-400 sm:text-4xl">
+              The things I've built
+              <span className="font-editorial font-normal italic text-yellow-400">
+                .
+              </span>
+            </h2>
           </div>
 
-          <span className="text-3xl transition-transform group-hover:translate-x-2">
-            →
+          <span className="inline-flex items-center gap-3 text-xs font-medium text-neutral-400 transition-colors group-hover:text-yellow-400">
+            Browse projects
+            <span className="text-lg transition-transform group-hover:translate-x-1">
+              ↗
+            </span>
           </span>
         </Link>
       </Reveal>

@@ -25,24 +25,31 @@ const quickLinks = [
 const focusAreas = [
   {
     number: "01",
-    title: "Full Stack Development",
+    title: "Web development",
     description:
-      "Building web experiences and exploring the MERN stack, from interface to application logic.",
-    tags: ["MongoDB", "Express", "React", "Node.js"],
+      "Most of my hands-on work is in React and the MERN stack — building interfaces, connecting application logic, and working with data.",
+    tags: ["React", "Node.js", "MongoDB"],
   },
   {
     number: "02",
-    title: "Data Analysis",
+    title: "Data & analysis",
     description:
-      "Exploring data, finding useful patterns, and turning information into clearer insights.",
-    tags: ["Analysis", "Insights"],
+      "I enjoy organising information, exploring datasets, and looking for patterns that make the numbers easier to understand.",
+    tags: [
+      "MySQL",
+      "Python",
+      "Analysis",
+      "Google Colab",
+      "Jupyter Notebook",
+      "Excel",
+    ],
   },
   {
     number: "03",
-    title: "UI / UX Design",
+    title: "Interface design",
     description:
-      "Paying attention to how a digital product looks, feels, and works for the people using it.",
-    tags: ["Interface", "Experience"],
+      "I pay attention to hierarchy, navigation, and the small interaction details that make an application easier to use.",
+    tags: ["Interface", "UX", "Interaction", "Figma"],
   },
 ];
 
@@ -50,27 +57,27 @@ const featuredProjects = [
   {
     number: "01",
     title: "Gamified LMS",
-    category: "FULL-STACK DEVELOPMENT",
+    category: "Full-stack · Learning platform",
     description:
-      "A Learning Management System with gamification to motivate and attract more students.",
+      "A learning management system that uses gamification to make lessons and student progress more engaging.",
     image: "/Images/ClassHub.png",
     alt: "ClassHub learning management system preview",
   },
   {
     number: "02",
     title: "Klinik Nakita",
-    category: "FRONTEND DEVELOPMENT",
+    category: "Frontend · Laravel Livewire",
     description:
-      "A modern ERM website built with Laravel Livewire and Tailwind CSS.",
+      "An ERM website for Klinik Nakita, built with Laravel Livewire and Tailwind CSS.",
     image: "/Images/Klinik Nakita.png",
     alt: "Klinik Nakita website preview",
   },
   {
     number: "03",
     title: "Expense Tracker",
-    category: "WEB APPLICATION",
+    category: "Web application · React",
     description:
-      "An application to track budgets and expenses, built with React.",
+      "A React application for keeping budgets and day-to-day expenses organised.",
     image: "/Images/Expense Tracker.png",
     alt: "Expense Tracker application preview",
   },
@@ -103,9 +110,11 @@ function ArrowIcon({ className = "h-5 w-5" }) {
 
 function SectionEyebrow({ number, children }) {
   return (
-    <div className="mb-7 flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.24em] text-neutral-400 md:text-xs">
-      <span className="text-yellow-400">{number}</span>
-      <span className="h-px w-9 bg-neutral-700" />
+    <div className="mb-6 flex items-center gap-3 text-[10px] font-medium tracking-[0.14em] text-neutral-500 md:text-[11px]">
+      <span className="font-mono text-yellow-400">{number}</span>
+
+      <span className="h-px w-7 bg-white/20" />
+
       <span>{children}</span>
     </div>
   );
@@ -127,7 +136,7 @@ function Reveal({
   children,
   className = "",
   delay = 0,
-  distance = 46,
+  distance = 28,
   ...props
 }) {
   const ref = useRef(null);
@@ -177,8 +186,7 @@ function Reveal({
       : {
           opacity: 0,
           y: distance,
-          scale: 0.985,
-          filter: "blur(7px)",
+          filter: "blur(2px)",
         },
 
     hiddenTop: reduceMotion
@@ -186,14 +194,12 @@ function Reveal({
       : {
           opacity: 0,
           y: -distance,
-          scale: 0.985,
-          filter: "blur(7px)",
+          filter: "blur(2px)",
         },
 
     visible: {
       opacity: 1,
       y: 0,
-      scale: 1,
       filter: "blur(0px)",
     },
   };
@@ -205,7 +211,7 @@ function Reveal({
       animate={phase}
       variants={variants}
       transition={{
-        duration: reduceMotion ? 0.15 : 0.72,
+        duration: reduceMotion ? 0.15 : 0.62,
         delay: phase === "visible" ? delay : 0,
         ease,
       }}
@@ -349,11 +355,9 @@ export default function Home() {
           {/* BACKGROUND */}
 
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute -right-32 top-24 h-[420px] w-[420px] rounded-full bg-yellow-400/[0.07] blur-[120px]" />
+            <div className="absolute -right-20 top-10 h-[500px] w-[500px] rounded-full bg-yellow-400/[0.045] blur-[150px]" />
 
-            <div className="absolute -left-40 bottom-0 h-[360px] w-[360px] rounded-full bg-white/[0.035] blur-[110px]" />
-
-            <div className="absolute inset-0 opacity-[0.035] [background-image:linear-gradient(rgba(255,255,255,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.7)_1px,transparent_1px)] [background-size:72px_72px]" />
+            <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
           </div>
 
           {/* HEADER */}
@@ -376,13 +380,13 @@ export default function Home() {
               </span>
 
               <span className="text-xs font-black uppercase tracking-[0.2em] text-white">
-                Yazid<span className="text-yellow-400">.</span>Portfolio
+                Yazid<span className="text-yellow-400">.</span>Nasution
               </span>
             </Link>
 
-            <div className="hidden items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400 sm:flex">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-yellow-400" />
-              Open to work · Medan, ID
+            <div className="hidden items-center gap-2 text-[11px] font-medium tracking-wide text-neutral-400 sm:flex">
+              <span className="h-1.5 w-1.5 rounded-full bg-yellow-400" />
+              Open to work · Medan, Indonesia
             </div>
 
             <Link
@@ -405,12 +409,12 @@ export default function Home() {
           >
             <motion.div className="relative z-10">
               <motion.p
-                initial={{ opacity: 0, y: 18 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1, ease }}
-                className="mb-6 text-[10px] font-black uppercase tracking-[0.3em] text-yellow-400 sm:text-xs"
+                className="mb-6 text-[11px] font-medium tracking-wide text-neutral-400 sm:text-xs"
               >
-                Personal portfolio · 2026
+                A place for what I've been learning and building.
               </motion.p>
 
               <motion.h1
@@ -420,12 +424,12 @@ export default function Home() {
                   hidden: {},
                   visible: {
                     transition: {
-                      staggerChildren: 0.12,
-                      delayChildren: 0.18,
+                      staggerChildren: 0.09,
+                      delayChildren: 0.14,
                     },
                   },
                 }}
-                className="max-w-[1050px] text-[clamp(3.25rem,8.8vw,8.8rem)] font-black uppercase leading-[0.82] tracking-[-0.075em]"
+                className="max-w-[1050px] text-[clamp(3.15rem,8.4vw,8.3rem)] font-semibold leading-[0.88] tracking-[-0.075em] text-[#F0EEE8]"
               >
                 {["Yazid Chairy", "Syahputra", "Nasution."].map(
                   (line, index) => (
@@ -434,24 +438,22 @@ export default function Home() {
                       variants={{
                         hidden: {
                           opacity: 0,
-                          y: 70,
-                          skewY: 5,
+                          y: 36,
                         },
                         visible: {
                           opacity: 1,
                           y: 0,
-                          skewY: 0,
                           transition: {
-                            duration: 0.8,
+                            duration: 0.7,
                             ease,
                           },
                         },
                       }}
                       className={`block ${
                         index === 1
-                          ? "mt-2 text-transparent [-webkit-text-stroke:1px_rgba(255,255,255,0.78)] sm:[-webkit-text-stroke:2px_rgba(255,255,255,0.78)]"
+                          ? "mt-1 font-editorial text-[1.04em] italic font-normal tracking-[-0.055em]"
                           : index === 2
-                            ? "mt-2 text-yellow-400"
+                            ? "mt-1 text-yellow-400"
                             : ""
                       }`}
                     >
@@ -468,14 +470,17 @@ export default function Home() {
                 className="mt-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between"
               >
                 <div>
-                  <p className="text-sm font-bold uppercase tracking-[0.16em] text-white sm:text-base">
-                    Full Stack Developer
-                  </p>
+                  <div>
+                    <p className="text-sm font-semibold tracking-wide text-[#F0EEE8] sm:text-base">
+                      Full-stack developer
+                    </p>
 
-                  <p className="mt-2 max-w-md text-sm leading-relaxed text-neutral-400">
-                    I build digital experiences through code, thoughtful design,
-                    and curiosity.
-                  </p>
+                    <p className="mt-2 max-w-md text-sm leading-7 text-neutral-400">
+                      I spend most of my time building web apps, working with
+                      data, and figuring out how to make things easier to use.
+                      (and do a little trolling)
+                    </p>
+                  </div>
                 </div>
 
                 <button
@@ -483,7 +488,7 @@ export default function Home() {
                   onClick={scrollToIntro}
                   className="group inline-flex w-fit items-center gap-3 border-b-2 border-yellow-400 pb-2 text-[11px] font-black uppercase tracking-[0.2em] text-white transition-colors hover:text-yellow-400"
                 >
-                  Explore the site
+                  Click to Explore
                   <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-yellow-400 text-yellow-400 transition-transform group-hover:translate-y-1">
                     ↓
                   </span>
@@ -506,20 +511,20 @@ export default function Home() {
                 rotate: 0,
               }}
               transition={{ duration: 1, delay: 0.35, ease }}
-              className="relative mx-auto w-full max-w-[220px] sm:max-w-[300px] md:ml-auto md:mr-0 md:mt-8 md:max-w-[390px]"
+              className="group relative mx-auto w-full max-w-[220px] sm:max-w-[300px] md:ml-auto md:mr-0 md:mt-8 md:max-w-[390px]"
             >
               <div className="absolute -right-3 -top-3 h-full w-full border border-yellow-400/70 sm:-right-5 sm:-top-5" />
 
-              <div className="relative aspect-[4/5] overflow-hidden border-[3px] border-white bg-neutral-900 shadow-[10px_10px_0_0_#facc15] sm:shadow-[16px_16px_0_0_#facc15]">
+              <div className="relative aspect-[4/5] overflow-hidden border border-white/25 bg-neutral-900">
+                {" "}
                 <img
                   src="/Images/profil.jpeg"
                   alt="Portrait of Yazid Chairy Syahputra Nasution"
-                  className="h-full w-full object-cover object-center grayscale transition duration-700 hover:scale-105 hover:grayscale-0"
+                  className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.02]"
                 />
-
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/45 to-transparent p-5 pt-20">
                   <p className="text-[10px] font-black uppercase tracking-[0.24em] text-yellow-400">
-                    The person behind the pixels
+                    Yep that's me
                   </p>
 
                   <p className="mt-1 text-xl font-black uppercase tracking-tight">
@@ -537,10 +542,6 @@ export default function Home() {
                   Medan, Indonesia
                 </p>
               </div>
-
-              <span className="absolute -right-5 top-10 hidden rotate-90 text-[9px] font-black uppercase tracking-[0.35em] text-neutral-500 lg:block">
-                Scroll to explore —
-              </span>
             </motion.div>
           </motion.div>
 
@@ -557,7 +558,7 @@ export default function Home() {
             <span>Developer · Analyst · Designer</span>
 
             <span className="flex items-center gap-2">
-              Scroll to discover <span className="text-yellow-400">↓</span>
+              Hit the road dude <span className="text-yellow-400">↓</span>
             </span>
 
             <span className="hidden sm:block">01 / 04</span>
@@ -582,86 +583,68 @@ export default function Home() {
         id="intro"
         className="relative scroll-mt-8 border-y border-white/10 bg-[#101010] px-5 py-24 sm:px-8 md:px-12 md:py-32 lg:px-[7vw]"
       >
-        <div className="mx-auto grid max-w-[1440px] gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-24">
-          <Reveal>
-            <SectionEyebrow number="01">A little introduction</SectionEyebrow>
+        <div className="mx-auto grid max-w-[1440px] gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-24">
+          {/* INTRODUCTION */}
 
-            <h2 className="max-w-xl text-5xl font-black uppercase leading-[0.9] tracking-[-0.06em] sm:text-6xl md:text-7xl">
-              More than
-              <span className="block text-yellow-400">just a title.</span>
+          <Reveal>
+            <SectionEyebrow number="01">A little about me</SectionEyebrow>
+
+            <h2 className="max-w-xl text-5xl font-semibold leading-[0.98] tracking-[-0.06em] sm:text-6xl md:text-7xl">
+              So, who
+              <span className="block font-editorial italic font-normal text-yellow-400">
+                am I?
+              </span>
             </h2>
 
-            <p className="mt-7 max-w-sm text-sm leading-7 text-neutral-400">
-              A quick look at who I am, what I explore, and the way I approach
-              building digital products.
+            <p className="mt-7 max-w-sm text-sm leading-8 text-neutral-400">
+              I'm a fresh graduate from the University of North Sumatra, focused
+              on full-stack web development.
             </p>
 
             <Link
               to="/identity"
-              className="group mt-8 inline-flex items-center gap-4 border-b-2 border-white pb-3 text-xs font-black uppercase tracking-[0.18em] transition-colors hover:border-yellow-400 hover:text-yellow-400"
+              className="group mt-8 inline-flex items-center gap-3 border-b border-white/40 pb-2 text-sm font-medium text-white transition-colors hover:border-yellow-400 hover:text-yellow-400"
             >
-              Read my full identity
+              A little more about me
               <ArrowIcon className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
             </Link>
           </Reveal>
 
-          <Reveal delay={0.12} distance={55} className="relative">
-            <div className="absolute -left-3 -top-3 h-full w-full border border-yellow-400/70 sm:-left-4 sm:-top-4" />
+          {/* PERSONAL STATEMENT */}
 
-            <div className="relative border border-white/20 bg-[#080808] p-6 sm:p-9 md:p-10">
-              <div className="flex flex-wrap items-start justify-between gap-4 border-b border-white/15 pb-6">
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.24em] text-yellow-400">
-                    Identity snapshot
-                  </p>
-
-                  <h3 className="mt-3 text-2xl font-black uppercase tracking-tight sm:text-3xl">
-                    Yazid Chairy Syahputra Nasution
-                  </h3>
-                </div>
-
-                <span className="border border-yellow-400 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.16em] text-yellow-400">
-                  Open to work
-                </span>
-              </div>
-
-              <p className="mt-6 max-w-2xl text-base leading-8 text-neutral-300 sm:text-lg">
-                A fresh graduate from the University of North Sumatra and a Full
-                Stack Web Developer focusing on the MERN stack. Open to
-                collaborate and explore ideas with others.
+          <Reveal delay={0.12} distance={30} className="relative lg:pl-10">
+            <div className="border-l border-yellow-400/60 pl-6 sm:pl-8">
+              <p className="max-w-2xl text-xl leading-[1.65] tracking-[-0.025em] text-neutral-200 sm:text-2xl md:text-3xl">
+                I like understanding how the pieces of a product fit together —
+                from the interface people use to the logic and data behind it.
               </p>
 
-              <div className="mt-8 grid gap-5 border-t border-white/15 pt-6 sm:grid-cols-2">
-                <div>
-                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-neutral-500">
-                    Based in
-                  </p>
+              <p className="mt-7 max-w-xl text-sm leading-8 text-neutral-400 sm:text-base">
+                Most of my hands-on work has been with React, Node.js, MongoDB,
+                and other web technologies. I'm still learning, building, and
+                getting better with every project.
+              </p>
+            </div>
 
-                  <p className="mt-2 text-sm font-bold text-white">
-                    Medan, Indonesia
-                  </p>
-                </div>
+            <div className="mt-10 grid gap-6 border-t border-white/10 pt-6 sm:grid-cols-2">
+              <div>
+                <p className="text-[10px] font-medium tracking-wide text-neutral-500">
+                  Currently based
+                </p>
 
-                <div>
-                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-neutral-500">
-                    Primary focus
-                  </p>
-
-                  <p className="mt-2 text-sm font-bold text-white">
-                    Full Stack Web Development
-                  </p>
-                </div>
+                <p className="mt-2 text-sm font-medium text-neutral-200">
+                  Medan, Indonesia
+                </p>
               </div>
 
-              <div className="mt-7 flex flex-wrap gap-2">
-                {["MongoDB", "Express", "React", "Node.js"].map((skill) => (
-                  <span
-                    key={skill}
-                    className="border border-white/35 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-neutral-200"
-                  >
-                    {skill}
-                  </span>
-                ))}
+              <div>
+                <p className="text-[10px] font-medium tracking-wide text-neutral-500">
+                  Working with
+                </p>
+
+                <p className="mt-2 text-sm font-medium text-neutral-200">
+                  React · Node.js · MongoDB
+                </p>
               </div>
             </div>
           </Reveal>
@@ -674,51 +657,44 @@ export default function Home() {
 
       <section className="relative px-5 py-24 sm:px-8 md:px-12 md:py-32 lg:px-[7vw]">
         <div className="mx-auto max-w-[1440px]">
-          <Reveal className="mb-12 flex flex-col justify-between gap-6 md:mb-16 md:flex-row md:items-end">
+          <Reveal className="mb-12 grid gap-7 md:mb-16 md:grid-cols-[1.1fr_0.9fr] md:items-end">
             <div>
-              <SectionEyebrow number="02">What I explore</SectionEyebrow>
+              <SectionEyebrow number="02">What I keep exploring</SectionEyebrow>
 
-              <h2 className="max-w-3xl text-5xl font-black uppercase leading-[0.9] tracking-[-0.06em] sm:text-6xl md:text-7xl">
-                Ideas into
-                <span className="text-yellow-400"> experiences.</span>
+              <h2 className="max-w-3xl text-5xl font-semibold leading-[0.98] tracking-[-0.06em] sm:text-6xl md:text-7xl">
+                Things I like
+                <span className="block font-editorial italic font-normal text-yellow-400">
+                  working on.
+                </span>
               </h2>
             </div>
 
-            <p className="max-w-xs text-sm leading-7 text-neutral-400">
-              A few areas that shape my curiosity and the kind of digital work I
-              enjoy exploring.
+            <p className="max-w-sm text-sm leading-8 text-neutral-400">
+              These are the parts of building digital products I keep finding
+              myself drawn to.
             </p>
           </Reveal>
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="border-t border-white/15">
             {focusAreas.map((area, index) => (
-              <Reveal key={area.number} delay={index * 0.1} distance={52}>
-                <article className="group flex h-full min-h-[300px] flex-col border border-white/20 bg-[#101010] p-6 transition-all duration-300 hover:-translate-y-2 hover:border-yellow-400 hover:bg-[#151515] sm:p-8">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-black text-yellow-400">
-                      /{area.number}
-                    </span>
+              <Reveal key={area.number} delay={index * 0.08} distance={24}>
+                <article className="grid gap-4 border-b border-white/10 py-7 md:grid-cols-[72px_0.9fr_1.1fr] md:items-start md:gap-8 md:py-10">
+                  <span className="font-mono text-xs text-yellow-400">
+                    /{area.number}
+                  </span>
 
-                    <ArrowIcon className="h-5 w-5 text-neutral-600 transition-all group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-yellow-400" />
-                  </div>
-
-                  <h3 className="mt-14 text-2xl font-black uppercase leading-tight tracking-tight sm:text-3xl">
+                  <h3 className="text-2xl font-medium tracking-tight text-[#F0EEE8] sm:text-3xl">
                     {area.title}
                   </h3>
 
-                  <p className="mt-4 flex-1 text-sm leading-7 text-neutral-400">
-                    {area.description}
-                  </p>
+                  <div>
+                    <p className="max-w-xl text-sm leading-8 text-neutral-400 sm:text-base">
+                      {area.description}
+                    </p>
 
-                  <div className="mt-7 flex flex-wrap gap-2">
-                    {area.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="border border-white/20 px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-neutral-300"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                    <p className="mt-4 text-[10px] font-medium tracking-wide text-neutral-500">
+                      {area.tags.join("  ·  ")}
+                    </p>
                   </div>
                 </article>
               </Reveal>
