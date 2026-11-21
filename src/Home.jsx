@@ -826,7 +826,7 @@ export default function Home() {
                 >
                   <div className="flex items-center gap-5 sm:gap-7">
                     <span className="text-xs font-black text-yellow-400 transition-colors group-hover:text-black">
-                      /{item.number}
+                      {item.number}
                     </span>
 
                     <span className="text-xl font-black uppercase tracking-tight sm:text-2xl">
